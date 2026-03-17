@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ClinicEase — Clinic Management for Indian Doctors</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #0f2544;
+    --blue:    #1a4480;
+    --accent:  #e8340a;
+    --gold:    #f5a623;
+    --green:   #1a7a4a;
+    --light:   #f0f4f9;
+    --white:   #ffffff;
+    --text:    #1a2433;
+    --muted:   #5a6a7e;
+    --border:  #d0dae8;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: var(--white);
+    overflow-x: hidden;
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2rem;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 1.4rem; color: var(--navy);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-cta {
+    background: var(--accent); color: white;
+    padding: 0.55rem 1.4rem; border-radius: 6px;
+    font-size: 0.9rem; font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cta:hover { background: #c42c08; transform: translateY(-1px); }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    display: flex; align-items: center;
+    padding: 7rem 2rem 4rem;
+    position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 80% 50%, rgba(26,68,128,0.6) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 10% 80%, rgba(232,52,10,0.12) 0%, transparent 60%);
+  }
+  .hero-grid {
+    position: relative; z-index: 2;
+    max-width: 1100px; margin: 0 auto; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(245,166,35,0.15);
+    border: 1px solid rgba(245,166,35,0.4);
+    color: var(--gold); font-size: 0.8rem; font-weight: 600;
+    padding: 0.35rem 0.9rem; border-radius: 20px;
+    margin-bottom: 1.2rem; letter-spacing: 0.05em; text-transform: uppercase;
+  }
+  .hero h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    color: white; line-height: 1.15;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 em {
+    font-style: italic; color: var(--gold);
+  }
+  .hero-sub {
+    color: rgba(255,255,255,0.7);
+    font-size: 1.05rem; line-height: 1.7;
+    margin-bottom: 2rem;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--accent); color: white;
+    padding: 0.85rem 2rem; border-radius: 8px;
+    font-size: 1rem; font-weight: 600;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s; box-shadow: 0 4px 20px rgba(232,52,10,0.35);
+  }
+  .btn-primary:hover { background: #c42c08; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(232,52,10,0.4); }
+  .btn-secondary {
+    background: rgba(255,255,255,0.1); color: white;
+    padding: 0.85rem 2rem; border-radius: 8px;
+    font-size: 1rem; font-weight: 500;
+    text-decoration: none; border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.18); }
+  .hero-trust {
+    display: flex; align-items: center; gap: 1rem;
+    margin-top: 1.8rem; color: rgba(255,255,255,0.5); font-size: 0.85rem;
+  }
+  .hero-trust span { display: flex; align-items: center; gap: 5px; }
+
+  /* ── HERO CARD (right side) ── */
+  .hero-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px; padding: 1.5rem;
+    backdrop-filter: blur(10px);
+  }
+  .hero-card-header {
+    background: var(--blue); border-radius: 10px;
+    padding: 1rem 1.2rem; margin-bottom: 1rem;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .hero-card-header h3 { color: white; font-size: 0.95rem; font-weight: 600; }
+  .kpi-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;
+  }
+  .kpi-box {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px; padding: 0.8rem 1rem;
+  }
+  .kpi-label { color: rgba(255,255,255,0.5); font-size: 0.72rem; margin-bottom: 4px; }
+  .kpi-value { color: white; font-size: 1.2rem; font-weight: 600; }
+  .kpi-value.green { color: #4ade80; }
+  .kpi-value.gold  { color: var(--gold); }
+  .kpi-value.red   { color: #f87171; }
+  .table-mini { width: 100%; border-collapse: collapse; }
+  .table-mini th {
+    background: rgba(26,68,128,0.6); color: rgba(255,255,255,0.7);
+    font-size: 0.7rem; padding: 6px 8px; text-align: left; font-weight: 500;
+  }
+  .table-mini td {
+    color: rgba(255,255,255,0.8); font-size: 0.75rem;
+    padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem; font-weight: 600;
+  }
+  .badge.green { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .badge.red   { background: rgba(248,113,113,0.15); color: #f87171; }
+
+  /* ── FEATURES ── */
+  .features {
+    padding: 6rem 2rem;
+    background: var(--light);
+  }
+  .section-label {
+    text-align: center;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    text-align: center; color: var(--navy);
+    margin-bottom: 0.8rem; line-height: 1.2;
+  }
+  .section-sub {
+    text-align: center; color: var(--muted);
+    font-size: 1rem; margin-bottom: 3.5rem; max-width: 520px; margin-left: auto; margin-right: auto;
+  }
+  .features-grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;
+  }
+  .feature-card {
+    background: white; border-radius: 12px;
+    padding: 1.8rem; border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .feature-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(15,37,68,0.1); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1rem;
+  }
+  .feature-card h3 { font-size: 1.05rem; font-weight: 600; color: var(--navy); margin-bottom: 0.5rem; }
+  .feature-card p  { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── SHEETS SECTION ── */
+  .sheets { padding: 6rem 2rem; background: white; }
+  .sheets-inner { max-width: 1100px; margin: 0 auto; }
+  .sheets-tabs {
+    display: flex; gap: 0.5rem; flex-wrap: wrap;
+    margin-bottom: 2rem; justify-content: center;
+  }
+  .tab-btn {
+    padding: 0.5rem 1.1rem; border-radius: 20px; font-size: 0.85rem; font-weight: 500;
+    border: 1px solid var(--border); background: white; color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn.active, .tab-btn:hover {
+    background: var(--navy); color: white; border-color: var(--navy);
+  }
+  .sheet-preview {
+    background: var(--navy); border-radius: 14px; overflow: hidden;
+    padding: 1.5rem;
+  }
+  .sheet-preview h3 { color: white; font-size: 1rem; margin-bottom: 1rem; opacity: 0.8; }
+  .preview-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .preview-table th {
+    background: var(--blue); color: white; padding: 8px 10px; text-align: left; font-weight: 500;
+  }
+  .preview-table td {
+    padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.06); color: rgba(255,255,255,0.8);
+  }
+  .preview-table tr:nth-child(even) td { background: rgba(255,255,255,0.03); }
+  .cell-yellow { background: rgba(255,242,0,0.12) !important; color: #ffd700 !important; }
+  .cell-green  { background: rgba(74,222,128,0.12) !important; color: #4ade80 !important; }
+  .cell-red    { background: rgba(248,113,113,0.12) !important; color: #f87171 !important; }
+  .cell-grey   { background: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.5) !important; }
+
+  /* ── PRICING ── */
+  .pricing {
+    padding: 6rem 2rem;
+    background: var(--light);
+  }
+  .pricing-grid {
+    max-width: 900px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;
+    align-items: start;
+  }
+  .price-card {
+    background: white; border-radius: 14px; padding: 2rem;
+    border: 1.5px solid var(--border);
+    transition: transform 0.2s;
+  }
+  .price-card:hover { transform: translateY(-4px); }
+  .price-card.featured {
+    border-color: var(--accent); box-shadow: 0 8px 40px rgba(232,52,10,0.12);
+    position: relative;
+  }
+  .featured-badge {
+    position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: white;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
+    padding: 4px 14px; border-radius: 20px; text-transform: uppercase; white-space: nowrap;
+  }
+  .price-name { font-size: 0.85rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.8rem; }
+  .price-amount { font-family: 'Instrument Serif', serif; font-size: 2.8rem; color: var(--navy); margin-bottom: 0.3rem; }
+  .price-amount sup { font-size: 1.2rem; vertical-align: super; }
+  .price-note { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .price-features { list-style: none; margin-bottom: 1.8rem; }
+  .price-features li {
+    font-size: 0.88rem; color: var(--text); padding: 0.4rem 0;
+    display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border);
+  }
+  .price-features li::before { content: '✓'; color: var(--green); font-weight: 700; flex-shrink: 0; }
+  .price-features li.no::before { content: '✗'; color: #ccc; }
+  .price-features li.no { color: var(--muted); }
+  .btn-buy {
+    display: block; width: 100%; text-align: center;
+    padding: 0.85rem; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+    text-decoration: none; transition: all 0.2s;
+  }
+  .btn-buy.primary { background: var(--accent); color: white; }
+  .btn-buy.primary:hover { background: #c42c08; }
+  .btn-buy.outline { border: 1.5px solid var(--border); color: var(--navy); background: white; }
+  .btn-buy.outline:hover { border-color: var(--navy); }
+
+  /* ── HOW TO BUY ── */
+  .how { padding: 5rem 2rem; background: white; }
+  .steps { max-width: 780px; margin: 0 auto; }
+  .step {
+    display: flex; gap: 1.5rem; align-items: flex-start;
+    padding: 1.5rem 0; border-bottom: 1px solid var(--border);
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+    background: var(--navy); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Instrument Serif', serif; font-size: 1.2rem;
+  }
+  .step h4 { font-size: 1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.3rem; }
+  .step p  { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+  /* ── FAQ ── */
+  .faq { padding: 5rem 2rem; background: var(--light); }
+  .faq-list { max-width: 700px; margin: 0 auto; }
+  .faq-item { border-bottom: 1px solid var(--border); }
+  .faq-q {
+    width: 100%; text-align: left; background: none; border: none;
+    padding: 1.2rem 0; cursor: pointer;
+    font-size: 0.95rem; font-weight: 600; color: var(--navy);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .faq-q span { font-size: 1.2rem; color: var(--accent); transition: transform 0.2s; }
+  .faq-q.open span { transform: rotate(45deg); }
+  .faq-a { font-size: 0.9rem; color: var(--muted); line-height: 1.7; padding-bottom: 1.2rem; display: none; }
+  .faq-a.open { display: block; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy); color: rgba(255,255,255,0.6);
+    text-align: center; padding: 2rem;
+    font-size: 0.85rem;
+  }
+  footer strong { color: white; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .hero-text > * { animation: fadeUp 0.6s ease both; }
+  .hero-text > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-text > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-text > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero-text > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero-text > *:nth-child(5) { animation-delay: 0.5s; }
+  .hero-card { animation: fadeUp 0.7s 0.5s ease both; }
+
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .hero-card { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">🏥 Clinic<span>Ease</span></div>
+  <a href="#pricing" class="nav-cta">Buy Now — ₹3,499</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div class="hero-text">
+      <div class="hero-badge">🇮🇳 Built for Indian Clinics</div>
+      <h1>Manage your clinic <em>without expensive software</em></h1>
+      <p class="hero-sub">
+        Complete clinic management in Excel. Patient records, billing, medicine stock, earnings — all in one file. One-time payment. No monthly fees. Works offline.
+      </p>
+      <div class="hero-actions">
+        <a href="#pricing" class="btn-primary">Get ClinicEase →</a>
+        <a href="#sheets" class="btn-secondary">See what's inside</a>
+      </div>
+      <div class="hero-trust">
+        <span>✓ One-time payment</span>
+        <span>✓ Works offline</span>
+        <span>✓ Setup in 30 min</span>
+      </div>
+    </div>
+
+    <!-- LIVE PREVIEW CARD -->
+    <div class="hero-card">
+      <div class="hero-card-header">
+        <span>📊</span>
+        <h3>Dashboard — Today at a Glance</h3>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi-box">
+          <div class="kpi-label">Today's Patients</div>
+          <div class="kpi-value green">24</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Today's Collection</div>
+          <div class="kpi-value gold">₹11,200</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">Pending Dues</div>
+          <div class="kpi-value red">₹1,500</div>
+        </div>
+        <div class="kpi-box">
+          <div class="kpi-label">This Month</div>
+          <div class="kpi-value">₹2,34,000</div>
+        </div>
+      </div>
+      <table class="table-mini">
+        <thead>
+          <tr><th>Patient</th><th>Visit</th><th>Fees</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Ravi Kumar</td><td>New</td><td>₹500</td><td><span class="badge green">Paid</span></td></tr>
+          <tr><td>Priya Sharma</td><td>Follow-Up</td><td>₹300</td><td><span class="badge red">₹100 due</span></td></tr>
+          <tr><td>Anil Verma</td><td>Emergency</td><td>₹800</td><td><span class="badge green">Paid</span></td></tr>
+          <tr><td>Sunita Devi</td><td>New</td><td>₹500</td><td><span class="badge green">Paid</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-label">Why ClinicEase</div>
+  <h2 class="section-title">Everything your clinic needs.<br>Nothing it doesn't.</h2>
+  <p class="section-sub">Built specifically for small Indian clinics that don't need expensive hospital software.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#e8f4fd;">📋</div>
+      <h3>Daily Patient Register</h3>
+      <p>Log every patient in seconds. Age, complaint, fees, payment mode. Balance calculates automatically. Green = paid, Red = pending.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fef3e2;">🧾</div>
+      <h3>One-Click Invoice</h3>
+      <p>Professional invoice with your clinic name and logo. Fill patient details, add services — total auto-calculates. Print with Ctrl+P.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#e8f8ee;">💊</div>
+      <h3>Medicine Inventory</h3>
+      <p>Track 200+ medicines. Status turns Orange when stock is low, Red when out of stock. Never run out of critical medicines again.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fdf2f8;">💰</div>
+      <h3>Doctor Earnings Tracker</h3>
+      <p>Daily income log with 12-month summary. See your best months, worst months, and payment mode breakdown — Cash vs UPI vs Card.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#f0edf8;">📊</div>
+      <h3>Live Dashboard</h3>
+      <p>One screen shows everything. Today's patients, this month's earnings, medicine alerts, earnings chart. No typing needed — fully automatic.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#fce8e8;">📖</div>
+      <h3>Built-in User Manual</h3>
+      <p>Red manual sheet inside the file. Every formula listed, troubleshooting guide, golden rules. If something breaks — fix it in 30 seconds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SHEETS PREVIEW -->
+<section class="sheets" id="sheets">
+  <div class="sheets-inner">
+    <div class="section-label">5 Sheets Inside</div>
+    <h2 class="section-title">See exactly what you get</h2>
+    <p class="section-sub">Every sheet is color-coded. Yellow = type here. Grey = auto-calculated. Simple.</p>
+
+    <div class="sheets-tabs">
+      <button class="tab-btn active" onclick="showTab('patient', this)">📋 Patient Register</button>
+      <button class="tab-btn" onclick="showTab('billing', this)">🧾 Billing</button>
+      <button class="tab-btn" onclick="showTab('medicine', this)">💊 Medicine</button>
+      <button class="tab-btn" onclick="showTab('earnings', this)">💰 Earnings</button>
+    </div>
+
+    <div id="patient" class="sheet-preview">
+      <h3>📋 Patient Register — 100 patient rows, auto serial number, auto balance</h3>
+      <table class="preview-table">
+        <thead><tr><th>S.No</th><th>Date</th><th>Patient Name</th><th>Age</th><th>Visit Type</th><th>Fees (₹)</th><th>Paid (₹)</th><th>Balance (₹)</th><th>Pay Mode</th></tr></thead>
+        <tbody>
+          <tr><td class="cell-grey">1</td><td class="cell-yellow">17-Mar-26</td><td class="cell-yellow">Ravi Kumar</td><td class="cell-yellow">34</td><td class="cell-yellow">New Patient</td><td class="cell-yellow">500</td><td class="cell-yellow">500</td><td class="cell-green">₹0</td><td class="cell-yellow">UPI</td></tr>
+          <tr><td class="cell-grey">2</td><td class="cell-yellow">17-Mar-26</td><td class="cell-yellow">Priya Sharma</td><td class="cell-yellow">28</td><td class="cell-yellow">Follow-Up</td><td class="cell-yellow">300</td><td class="cell-yellow">200</td><td class="cell-red">₹100</td><td class="cell-yellow">Cash</td></tr>
+          <tr><td class="cell-grey">3</td><td class="cell-yellow">17-Mar-26</td><td class="cell-yellow">Anil Verma</td><td class="cell-yellow">52</td><td class="cell-yellow">Emergency</td><td class="cell-yellow">800</td><td class="cell-yellow">800</td><td class="cell-green">₹0</td><td class="cell-yellow">Card</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="billing" class="sheet-preview" style="display:none">
+      <h3>🧾 Billing — Auto invoice, auto total, print ready</h3>
+      <table class="preview-table">
+        <thead><tr><th>#</th><th>Service Description</th><th>Qty</th><th>Rate (₹)</th><th>Amount (₹)</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="cell-yellow">Consultation Fee</td><td class="cell-yellow">1</td><td class="cell-yellow">500</td><td class="cell-grey">₹500</td></tr>
+          <tr><td>2</td><td class="cell-yellow">Blood Test</td><td class="cell-yellow">1</td><td class="cell-yellow">200</td><td class="cell-grey">₹200</td></tr>
+          <tr><td>3</td><td class="cell-yellow">Medicine</td><td class="cell-yellow">2</td><td class="cell-yellow">75</td><td class="cell-grey">₹150</td></tr>
+          <tr><td colspan="4" style="text-align:right;font-weight:600;color:white">Total</td><td class="cell-green" style="font-weight:700">₹850</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="medicine" class="sheet-preview" style="display:none">
+      <h3>💊 Medicine Inventory — 200 medicines, auto alerts</h3>
+      <table class="preview-table">
+        <thead><tr><th>Medicine</th><th>Category</th><th>Stock</th><th>Reorder At</th><th>Status</th><th>Stock Value</th></tr></thead>
+        <tbody>
+          <tr><td class="cell-yellow">Paracetamol 500mg</td><td class="cell-yellow">Analgesic</td><td class="cell-yellow">120</td><td class="cell-yellow">20</td><td class="cell-green">OK</td><td class="cell-grey">₹1,800</td></tr>
+          <tr><td class="cell-yellow">Amoxicillin 250mg</td><td class="cell-yellow">Antibiotic</td><td class="cell-yellow">15</td><td class="cell-yellow">30</td><td style="background:rgba(243,156,18,0.15);color:#f5a623" class="badge">Low Stock</td><td class="cell-grey">₹675</td></tr>
+          <tr><td class="cell-yellow">Azithromycin 500mg</td><td class="cell-yellow">Antibiotic</td><td class="cell-yellow">0</td><td class="cell-yellow">15</td><td class="cell-red">Out of Stock</td><td class="cell-grey">₹0</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="earnings" class="sheet-preview" style="display:none">
+      <h3>💰 Doctor Earnings — Daily log + 12-month auto summary</h3>
+      <table class="preview-table">
+        <thead><tr><th>Month</th><th>Total Collected (₹)</th><th>Patients</th><th>Avg Fee (₹)</th></tr></thead>
+        <tbody>
+          <tr><td>January</td><td class="cell-grey">₹1,82,000</td><td class="cell-grey">364</td><td class="cell-grey">₹500</td></tr>
+          <tr><td>February</td><td class="cell-grey">₹1,65,000</td><td class="cell-grey">330</td><td class="cell-grey">₹500</td></tr>
+          <tr><td style="color:#ffd700;font-weight:600">March ← current</td><td class="cell-green" style="font-weight:600">₹2,34,000</td><td class="cell-green">468</td><td class="cell-green">₹500</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-label">Simple Pricing</div>
+  <h2 class="section-title">One-time payment. Yours forever.</h2>
+  <p class="section-sub">No subscriptions. No renewals. No internet required. Pay once, use forever.</p>
+
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Basic</div>
+      <div class="price-amount"><sup>₹</sup>1,999</div>
+      <div class="price-note">One-time · Self setup</div>
+      <ul class="price-features">
+        <li>All 5 sheets included</li>
+        <li>User manual inside file</li>
+        <li>Formula directory</li>
+        <li>Email delivery</li>
+        <li class="no">Setup assistance</li>
+        <li class="no">WhatsApp support</li>
+      </ul>
+      <a href="https://wa.me/919999999999?text=Hi%2C+I+want+to+buy+ClinicEase+Basic+%E2%82%B91999" class="btn-buy outline" target="_blank">Buy Basic</a>
+    </div>
+
+    <div class="price-card featured">
+      <div class="featured-badge">⭐ Most Popular</div>
+      <div class="price-name">Standard</div>
+      <div class="price-amount"><sup>₹</sup>3,499</div>
+      <div class="price-note">One-time · With setup</div>
+      <ul class="price-features">
+        <li>All 5 sheets included</li>
+        <li>User manual inside file</li>
+        <li>Formula directory</li>
+        <li>Email delivery</li>
+        <li>Setup on your laptop</li>
+        <li class="no">WhatsApp support</li>
+      </ul>
+      <a href="https://wa.me/919999999999?text=Hi%2C+I+want+to+buy+ClinicEase+Standard+%E2%82%B93499" class="btn-buy primary" target="_blank">Buy Standard — ₹3,499</a>
+    </div>
+
+    <div class="price-card">
+      <div class="price-name">Premium</div>
+      <div class="price-amount"><sup>₹</sup>5,999</div>
+      <div class="price-note">One-time · Full support</div>
+      <ul class="price-features">
+        <li>All 5 sheets included</li>
+        <li>User manual inside file</li>
+        <li>Formula directory</li>
+        <li>Email delivery</li>
+        <li>Setup on your laptop</li>
+        <li>1 month WhatsApp support</li>
+      </ul>
+      <a href="https://wa.me/919999999999?text=Hi%2C+I+want+to+buy+ClinicEase+Premium+%E2%82%B95999" class="btn-buy outline" target="_blank">Buy Premium</a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO BUY -->
+<section class="how">
+  <div class="section-label">How It Works</div>
+  <h2 class="section-title" style="text-align:center;margin-bottom:2.5rem">Get ClinicEase in 3 steps</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <h4>Click Buy & WhatsApp us</h4>
+        <p>Click any Buy button above. It opens WhatsApp with your order details pre-filled. Just send the message.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <h4>Pay via UPI / Bank Transfer</h4>
+        <p>We send you our UPI ID or bank details. Pay instantly from any UPI app — GPay, PhonePe, Paytm. Takes 30 seconds.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <h4>Receive your file & start using</h4>
+        <p>We send the Excel file on WhatsApp within 30 minutes. Open it, read the Red Manual, and start entering patients the same day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="section-label">FAQ</div>
+  <h2 class="section-title" style="margin-bottom:2.5rem">Common questions</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Do I need internet to use ClinicEase? <span>+</span></button>
+      <div class="faq-a">No. ClinicEase is a Microsoft Excel file. It works completely offline. You only need Excel installed on your computer or laptop.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">What if I accidentally delete a formula? <span>+</span></button>
+      <div class="faq-a">No problem. The built-in Red Manual sheet has a complete Formula Directory. Every formula is listed with its cell location and exact text. Find it and retype it in 30 seconds.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I use this on mobile? <span>+</span></button>
+      <div class="faq-a">Yes. You can use the Microsoft Excel mobile app (free) on Android or iPhone. Most features work on mobile. For best experience, use a laptop or desktop.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Is there a monthly fee? <span>+</span></button>
+      <div class="faq-a">Absolutely not. ClinicEase is a one-time payment. Pay once, use forever. No subscriptions, no renewals, no hidden charges.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">Can I customise it for my clinic? <span>+</span></button>
+      <div class="faq-a">Yes. The Standard and Premium packages include setup where we personalise it with your clinic name, doctor name, address and logo. Additional customisation available at ₹500–₹1,000 extra.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">How is this different from Practo or other software? <span>+</span></button>
+      <div class="faq-a">Practo costs ₹5,000–₹15,000 per month. ClinicEase costs ₹3,499 once — forever. It works offline, needs no training, and doctors already know Excel. For small clinics, ClinicEase does everything you actually need.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p style="font-size:1.1rem;margin-bottom:0.5rem"><strong>ClinicEase</strong> — Built for Indian Clinics</p>
+  <p>Questions? WhatsApp us at <strong>+91 99999 99999</strong> &nbsp;|&nbsp; clinicease@gmail.com</p>
+  <p style="margin-top:1rem;font-size:0.78rem;opacity:0.5">© 2026 ClinicEase. All rights reserved.</p>
+</footer>
+
+<script>
+function showTab(id, btn) {
+  ['patient','billing','medicine','earnings'].forEach(t => {
+    document.getElementById(t).style.display = 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).style.display = 'block';
+  btn.classList.add('active');
+}
+
+function toggleFaq(btn) {
+  const ans = btn.nextElementSibling;
+  const isOpen = ans.classList.contains('open');
+  document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.faq-q').forEach(b => b.classList.remove('open'));
+  if (!isOpen) {
+    ans.classList.add('open');
+    btn.classList.add('open');
+  }
+}
+</script>
+</body>
+</html>
